@@ -88,8 +88,10 @@ void renderFrame(u8 bgColor[3], u8 waterBorderColor[3], u8 waterColor[3])
 		if(!menuret_enabled)
 		{
 			drawError(GFX_BOTTOM,
-				"Reboot",
-				"    You're about to reboot your console into Home Menu.\n\n"
+				"Exit the Homebrew Launcher",
+				"    You're about to exit the homebrew launcher.\n"
+				"    However, your *hax payload does not support\n"
+				"'Crash to HOME Menu' functionality. Reboot?\n\n"
 				"                                                                                            A : Proceed\n"
 				"                                                                                            B : Cancel\n",
 				0);
@@ -97,48 +99,55 @@ void renderFrame(u8 bgColor[3], u8 waterBorderColor[3], u8 waterColor[3])
 		else
 		{
 			drawError(GFX_BOTTOM,
-				"Reboot",
-				"    You're about to reboot your console into Home Menu.\n\n"
-				"                                                                    A : Proceed\n"
+				"Exit the Homebrew Launcher",
+				"    You're about to exit the homebrew launcher.\n"
+				"    How would you like to do this?\n\n"
+				"                                                                    A : Reboot\n"
 				"                                                                    B : Cancel\n"
-				"                                                                    X : Return to Home Menu (no reboot)\n",
+				"                                                                    X : Crash to HOME Menu (no reboot)\n",
 				0);
 		}
 	}else if(!sdmcCurrent)
 	{
 		//no SD
 		drawError(GFX_BOTTOM,
-			"No SD detected",
+			"No SD card detected",
 			"    It looks like your 3DS doesn't have an SD inserted into it.\n"
-			"    Please insert an SD card for optimal homebrew launcher performance !\n",
+			"    Please insert an SD card to continue, or press START to exit.\n",
 			0);
 	}else if(sdmcCurrent<0)
 	{
 		//SD error
 		drawError(GFX_BOTTOM,
-			"SD Error",
+			"SD Card Mount Error",
 			"    Something unexpected happened when trying to mount your SD card.\n"
 			"    Try taking it out and putting it back in. If that doesn't work,\n"
-			"please try again with another SD card.",
+			"please try using another SD card.",
 			0);
 	}else if(hbmenu_state == HBMENU_NETLOADER_ACTIVE){
 		char bof[256];
 		u32 ip = gethostid();
 		sprintf(bof,
-			"    NetLoader Active - waiting for 3dslink connection\n"
+			"    Waiting for 3dslink connection.\n"
 			"    IP: %lu.%lu.%lu.%lu, Port: %d\n\n"
+			"    To connect, run this command in your project directory:\n"
+			"    $DEVKITARM/bin/3dslink -a %lu.%lu.%lu.%lu my3dsproject.3dsx\n\n"
 			"                                                                                            B : Cancel\n",
-			ip & 0xFF, (ip>>8)&0xFF, (ip>>16)&0xFF, (ip>>24)&0xFF, NETLOADER_PORT);
+			ip & 0xFF, (ip>>8)&0xFF, (ip>>16)&0xFF, (ip>>24)&0xFF, NETLOADER_PORT,
+			ip & 0xFF, (ip>>8)&0xFF, (ip>>16)&0xFF, (ip>>24)&0xFF
+			);
 
 		drawError(GFX_BOTTOM,
-			"NetLoader",
+			"NetLoader Ready",
 			bof,
 			0);
 	}else if(hbmenu_state == HBMENU_NETLOADER_UNAVAILABLE_NINJHAX2){
 		drawError(GFX_BOTTOM,
-			"NetLoader",
+			"NetLoader Unavailable",
 			"    The NetLoader is currently unavailable. :(\n"
-			"    This might be normal and fixable. Try and enable it ?\n\n"
+			"    This might be normal and fixable. Also ensure you are in range\n"
+			"of a wireless access point.\n"
+			"    Try enabling the NetLoader again?\n\n"
 			"                                                                                            A : Yes\n"
 			"                                                                                            B : No\n",
 			0);
@@ -146,16 +155,16 @@ void renderFrame(u8 bgColor[3], u8 waterBorderColor[3], u8 waterColor[3])
 		if(regionFreeGamecardIn)
 		{
 			drawError(GFX_BOTTOM,
-				"Region free launcher",
-				"    The region free launcher is ready to run your out-of-region gamecard !\n\n"
-				"                                                                                                                 A : Play\n"
+				"Region-Free Launcher",
+				"    The Region-Free Launcher is ready to run your game card!\n\n"
+				"                                                                                                                 A : Start\n"
 				"                                                                                                                 B : Cancel\n",
 				10-drawMenuEntry(&gamecardMenuEntry, GFX_BOTTOM, 240, 9, true));
 		}else{
 			drawError(GFX_BOTTOM,
-				"Region free launcher",
-				"    The region free loader cannot detect a gamecard in the slot.\n"
-				"    Please insert a gamecard in your console before continuing.\n\n"
+				"Region-Free Launcher",
+				"    The Region-Free Launcher cannot detect a game card in the slot.\n"
+				"    Please insert a game card into your console before continuing.\n\n"
 				"                                                                                            B : Cancel\n",
 				0);
 		}
@@ -163,9 +172,11 @@ void renderFrame(u8 bgColor[3], u8 waterBorderColor[3], u8 waterColor[3])
 		drawTitleBrowser(&titleBrowser);
 	}else if(hbmenu_state == HBMENU_TITLETARGET_ERROR){
 		drawError(GFX_BOTTOM,
-			"Missing target title",
-			"    The application you are trying to run requested a specific target title.\n"
-			"    Please make sure you have that title !\n\n"
+			"Missing Target Title",
+			"    The application you are trying to run requested to run under\n"
+			"a specific target title.\n"
+			"    Please ensure that that title is available to the system, either by installing it"
+			"or inserting a Game Card which contains it.\n\n"
 			"                                                                                            B : Back\n",
 			0);
 	}else if(hbmenu_state == HBMENU_NETLOADER_ERROR){
